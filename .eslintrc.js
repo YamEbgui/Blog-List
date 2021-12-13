@@ -10,9 +10,7 @@ module.exports = {
     ecmaVersion: 12,
   },
   rules: {
-    indent: ["error", 2],
-    "linebreak-style": ["error", "unix"],
+    indent: ["error", 2, { FunctionDeclaration: { body: 1, parameters: 2 } }],
     quotes: ["error", "double"],
-    "no-console": 0,
   },
 };
