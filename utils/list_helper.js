@@ -13,7 +13,24 @@ const totalLikes = (blogs) => {
   }
 };
 
+const favoriteBlog = (blogs) => {
+  if (blogs.length === 0) {
+    return [];
+  }
+  const reducer = (previousValue, currentValue) => {
+    if (previousValue.likes >= currentValue.likes) {
+      return previousValue;
+    } else {
+      return currentValue;
+    }
+  };
+  const fav = blogs.reduce(reducer);
+  const { title, author, likes } = fav;
+  return { title, author, likes };
+};
+
 module.exports = {
   dummy,
   totalLikes,
+  favoriteBlog,
 };
