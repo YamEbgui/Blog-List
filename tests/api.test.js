@@ -116,6 +116,28 @@ describe("post blog api", () => {
     expect(existBlogsDB[0].likes).toBe(0);
   });
 
+  test("add blog with no title property will failed", async () => {
+    const mockBlog = {
+      author: "Michael Chan",
+      url: "https://reactpatterns.com/",
+      likes: 7,
+    };
+    await request(app).post("/api/blogs").send(mockBlog).expect(400);
+    const existBlogsDB = await Blog.find({});
+    expect(existBlogsDB.length).toBe(0);
+  });
+
+  test("add blog with no url property will failed", async () => {
+    const mockBlog = {
+      title: "React patterns",
+      author: "Michael Chan",
+      likes: 7,
+    };
+    await request(app).post("/api/blogs").send(mockBlog).expect(400);
+    const existBlogsDB = await Blog.find({});
+    expect(existBlogsDB.length).toBe(0);
+  });
+
   afterAll(async () => {
     await Blog.deleteMany({});
     mongoose.connection.close();

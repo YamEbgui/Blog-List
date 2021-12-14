@@ -10,8 +10,8 @@ blogRouter.get("/", (request, response) => {
 blogRouter.post("/", (request, response) => {
   try {
     let { title, author, url, likes } = request.body;
-    if (!title || !author || !url) {
-      return response.status(403).json("Invalid configuration to add blog");
+    if (!title || !url) {
+      return response.status(400).json("Invalid configuration to add blog");
     }
     if (!likes) {
       likes = 0;
@@ -23,6 +23,21 @@ blogRouter.post("/", (request, response) => {
     });
   } catch (error) {
     response.status(400).json(error);
+  }
+});
+
+blogRouter.delete("/:id", async (request, response) => {
+  try {
+    const { id } = request.params;
+    if (!id) {
+      return response.status(400).send("Id not recognized");
+    }
+    const removed = await Blog.findByIdAndRemove(id);
+    if (removed.title !== undefined) {
+      return response.status(200).json(removed);
+    }
+  } catch (error) {
+    response.status(400).send(error);
   }
 });
 
