@@ -60,24 +60,64 @@ describe("get blogs api", () => {
   });
 
   test("empty database return empty array", async () => {
-    const response = await request(app).get("/api/blogs");
+    const response = await request(app).get("/api/blogs").expect(200);
     expect(response.body.length).toBe(0);
   });
 
   test("return multiply blogs from database", async () => {
     await Blog.insertMany(mockBlogs);
-    const response = await request(app).get("/api/blogs");
+    const response = await request(app).get("/api/blogs").expect(200);
     expect(response.body.length).toBe(6);
   });
 
-  test("check that all the blogs has unique identifier (id)", async () => {
+  test("check that blogs return from database with unique identifier (id)", async () => {
     await Blog.insertMany(mockBlogs);
-    const response = await request(app).get("/api/blogs");
+    const response = await request(app).get("/api/blogs").expect(200);
     const existBlogs = response.body;
     expect(existBlogs[0].id).toBeDefined();
   });
 
-  afterAll(() => {
+  //   afterAll(() => {
+  //     mongoose.connection.close();
+  //     app.killServer();
+  //   });
+});
+
+describe("post blog api", () => {
+  beforeEach(async () => {
+    await Blog.deleteMany({});
+  });
+
+  test("add blog to database succesfully", async () => {
+    const mockBlog = {
+      title: "React patterns",
+      author: "Michael Chan",
+      url: "https://reactpatterns.com/",
+      likes: 7,
+    };
+    await request(app).post("/api/blogs").send(mockBlog).expect(201);
+    const existBlogsDB = await Blog.find({});
+    expect(existBlogsDB.length).toBe(1);
+
+    const titles = existBlogsDB.map((blog) => blog.title);
+    expect(titles).toContain("React patterns");
+  });
+
+  test("add blog that has no likes property automatically added to database with likes:0", async () => {
+    const mockBlog = {
+      title: "React patterns",
+      author: "Michael Chan",
+      url: "https://reactpatterns.com/",
+    };
+    await request(app).post("/api/blogs").send(mockBlog).expect(201);
+    const existBlogsDB = await Blog.find({ title: "React patterns" });
+    console.log(existBlogsDB);
+    expect(existBlogsDB.length).toBe(1);
+    expect(existBlogsDB[0].likes).toBe(0);
+  });
+
+  afterAll(async () => {
+    await Blog.deleteMany({});
     mongoose.connection.close();
     app.killServer();
   });
