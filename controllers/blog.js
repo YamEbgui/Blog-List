@@ -1,14 +1,29 @@
 const blogRouter = require("express").Router();
+const jwt = require("jsonwebtoken");
 const Blog = require("../models/blog");
+const User = require("../models/user");
 
-blogRouter.get("/", (request, response) => {
-  Blog.find({}).then((blogs) => {
-    response.json(blogs);
-  });
+blogRouter.get("/", async (request, response) => {
+  const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
+  response.json(blogs);
 });
 
-blogRouter.post("/", (request, response) => {
+const getTokenFromRequest = (request) => {
+  const authorization = request.get("authorization");
+  if (authorization && authorization.toLowerCase().startsWith("bearer ")) {
+    return authorization.substring(7);
+  }
+  return null;
+};
+
+blogRouter.post("/", async (request, response) => {
   try {
+    const token = getTokenFromRequest(request);
+    const decodedToken = jwt.verify(token, process.env.SECRET);
+    if (!token || !decodedToken.id) {
+      return response.status(401).json({ error: "token missing or invalid" });
+    }
+    const resultUser = await User.findById(decodedToken.id);
     let { title, author, url, likes } = request.body;
     if (!title || !url) {
       return response.status(400).json("Invalid configuration to add blog");
@@ -16,11 +31,13 @@ blogRouter.post("/", (request, response) => {
     if (!likes) {
       likes = 0;
     }
-    const blog = new Blog({ title, author, url, likes });
+    const blog = new Blog({ title, author, url, likes, user: resultUser._id });
 
-    blog.save().then((result) => {
-      response.status(201).json(result);
+    const savedBlog = await blog.save();
+    await resultUser.updateOne({
+      $set: resultUser.blogs.concat(savedBlog._id),
     });
+    return response.status(201).json(savedBlog);
   } catch (error) {
     response.status(400).json(error);
   }

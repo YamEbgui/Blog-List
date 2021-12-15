@@ -1,9 +1,17 @@
 const mongoose = require("mongoose");
 const Blog = require("../models/blog");
-require("dotenv").config();
+const User = require("../models/user");
 const request = require("supertest");
 const app = require("../app");
-const mockBlogs = [
+const mockUsers = [
+  {
+    username: "mluukkai",
+  },
+  {
+    username: "hellas",
+  },
+];
+let mockBlogs = [
   {
     _id: "5a422a851b54a676234d17f7",
     title: "React patterns",
@@ -56,7 +64,16 @@ const mockBlogs = [
 
 describe("get blogs api", () => {
   beforeEach(async () => {
+    //This function set blog database to be empty and insert users to database
+    //Also insert to the mock blogs id of user as property.
     await Blog.deleteMany({});
+    await User.deleteMany({});
+    await User.insertMany(mockUsers);
+    const oneUser = await User.find({});
+    mockBlogs = mockBlogs.map((blog) => {
+      blog.user = oneUser[0].id;
+      return blog;
+    });
   });
 
   test("empty database return empty array", async () => {
@@ -76,11 +93,6 @@ describe("get blogs api", () => {
     const existBlogs = response.body;
     expect(existBlogs[0].id).toBeDefined();
   });
-
-  //   afterAll(() => {
-  //     mongoose.connection.close();
-  //     app.killServer();
-  //   });
 });
 
 describe("post blog api", () => {
@@ -89,11 +101,13 @@ describe("post blog api", () => {
   });
 
   test("add blog to database succesfully", async () => {
+    const users = await User.find({});
     const mockBlog = {
       title: "React patterns",
       author: "Michael Chan",
       url: "https://reactpatterns.com/",
       likes: 7,
+      user: users[0].id,
     };
     await request(app).post("/api/blogs").send(mockBlog).expect(201);
     const existBlogsDB = await Blog.find({});
@@ -104,23 +118,26 @@ describe("post blog api", () => {
   });
 
   test("add blog that has no likes property automatically added to database with likes:0", async () => {
+    const users = await User.find({});
     const mockBlog = {
       title: "React patterns",
       author: "Michael Chan",
       url: "https://reactpatterns.com/",
+      user: users[0].id,
     };
     await request(app).post("/api/blogs").send(mockBlog).expect(201);
     const existBlogsDB = await Blog.find({ title: "React patterns" });
-    console.log(existBlogsDB);
     expect(existBlogsDB.length).toBe(1);
     expect(existBlogsDB[0].likes).toBe(0);
   });
 
   test("add blog with no title property will failed", async () => {
+    const users = await User.find({});
     const mockBlog = {
       author: "Michael Chan",
       url: "https://reactpatterns.com/",
       likes: 7,
+      user: users[0].id,
     };
     await request(app).post("/api/blogs").send(mockBlog).expect(400);
     const existBlogsDB = await Blog.find({});
@@ -128,10 +145,12 @@ describe("post blog api", () => {
   });
 
   test("add blog with no url property will failed", async () => {
+    const users = await User.find({});
     const mockBlog = {
       title: "React patterns",
       author: "Michael Chan",
       likes: 7,
+      user: users[0].id,
     };
     await request(app).post("/api/blogs").send(mockBlog).expect(400);
     const existBlogsDB = await Blog.find({});
