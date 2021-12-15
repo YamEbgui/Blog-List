@@ -1,3 +1,4 @@
+const User = require("../models/user");
 // eslint-disable-next-line no-unused-vars
 const dummy = (blogs) => {
   return 1;
@@ -29,7 +30,13 @@ const favoriteBlog = (blogs) => {
   return { title, author, likes };
 };
 
+const usersInDb = async () => {
+  const users = await User.find({});
+  return users.map((u) => u.toJSON());
+};
+
 module.exports = {
+  usersInDb,
   dummy,
   totalLikes,
   favoriteBlog,

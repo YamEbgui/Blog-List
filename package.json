@@ -20,12 +20,14 @@
   },
   "homepage": "https://github.com/YamEbgui/Blog-List#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "eslint": "^8.4.1",
     "express": "^4.17.1",
     "http": "^0.0.1-security",
     "mongoose": "^6.1.1",
+    "mongoose-unique-validator": "^3.0.0",
     "nodemon": "^2.0.15"
   },
   "devDependencies": {
