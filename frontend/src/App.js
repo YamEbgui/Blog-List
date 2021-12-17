@@ -1,65 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import Notification from "./components/Notification";
+import Togglable from "./components/Togglable";
+import LoginForm from "./components/LoginForm";
 import AddBlog from "./components/AddBlog";
 import blogService from "./services/blogService";
-import loginService from "./services/loginService";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
   const [user, setUser] = useState(null);
+  const blogFormRef = useRef();
 
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
+  const loginForm = () => {
+    return (
+      <Togglable buttonLabel="login">
+        <LoginForm setUser={setUser} setErrorMessage={setErrorMessage} />
+      </Togglable>
+    );
+  };
+
+  const addBlogForm = () => {
+    return (
+      <Togglable buttonLabel="New Blog" ref={blogFormRef}>
+        <AddBlog
+          setBlogsState={setBlogs}
+          setErrorMessage={setErrorMessage}
+          blogFormRef={blogFormRef}
         />
-      </div>
-      <div>
-        password
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>
-  );
+      </Togglable>
+    );
+  };
 
   const handleLogout = (event) => {
     event.preventDefault();
     window.localStorage.removeItem("loggedBlogappUser");
     setUser(null);
-  };
-
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    try {
-      const user = await loginService.login({
-        username,
-        password,
-      });
-      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
-      blogService.setToken(user.token);
-      setUser(user);
-      setUsername("");
-      setPassword("");
-    } catch (exception) {
-      setErrorMessage("Wrong Username Or Password");
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 5000);
-    }
   };
 
   useEffect(() => {
@@ -86,10 +62,7 @@ const App = () => {
         <div>
           <p>{user.name} logged-in</p>
           <button onClick={handleLogout}>Logout</button>
-          <AddBlog
-            setBlogsState={setBlogs}
-            setErrorMessage={setErrorMessage}
-          ></AddBlog>
+          {addBlogForm()}
         </div>
       )}
 

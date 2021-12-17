@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import blogService from "../services/blogService";
-import Notification from "./Notification";
 
-const AddBlog = ({ setBlogsState, setErrorMessage }) => {
+const AddBlog = ({ setBlogsState, setErrorMessage, blogFormRef }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
@@ -18,10 +17,12 @@ const AddBlog = ({ setBlogsState, setErrorMessage }) => {
       setTitle("");
       setAuthor("");
       setUrl("");
+      blogFormRef.current.toggleVisibility(); //call to function that make 'Add New Blog' section to be hidden
       console.log(blog);
       setBlogsState([]);
       setErrorMessage(`a new blog ${title} by ${author} added`);
     } catch (exception) {
+      console.log(exception);
       setErrorMessage("Information Is Missing");
       setTimeout(() => {
         setErrorMessage(null);
