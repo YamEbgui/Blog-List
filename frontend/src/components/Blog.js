@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import blogService from "../services/blogService";
+
 const Blog = ({ blog }) => {
   const [fullyDisplayed, setDisplay] = useState(false);
 
@@ -12,8 +14,8 @@ const Blog = ({ blog }) => {
 
   const buttonStyle = {
     display: "block",
-    "margin-left": "auto",
-    "margin-right": 0,
+    marginLeft: "auto",
+    marginRight: 0,
   };
 
   const toggleDisplayBlog = () => {
@@ -32,7 +34,14 @@ const Blog = ({ blog }) => {
           <p>{blog.url}</p>
         </a>
         <p>
-          {"likes: " + blog.likes} <button>👍</button>
+          {"likes: " + blog.likes}{" "}
+          <button
+            onClick={() => {
+              return blogService.update(blog.id);
+            }}
+          >
+            👍
+          </button>
         </p>
         <p>{blog.user.name}</p>
       </div>

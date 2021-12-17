@@ -58,4 +58,15 @@ blogRouter.delete("/:id", async (request, response) => {
   }
 });
 
+blogRouter.put("/:id", async (request, response) => {
+  try {
+    const { id } = request.params;
+    const blog = await Blog.findById(id);
+    await blog.updateOne({ likes: ++blog.likes });
+    response.status(200).send("LikesAdd");
+  } catch (error) {
+    response.status(400).send(error);
+  }
+});
+
 module.exports = blogRouter;
