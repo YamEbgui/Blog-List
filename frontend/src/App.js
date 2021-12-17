@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Blog from "./components/Blog";
+import Notification from "./components/Notification";
+import AddBlog from "./components/AddBlog";
 import blogService from "./services/blogService";
 import loginService from "./services/loginService";
-import Notification from "./components/Notification";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -63,7 +64,7 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
+  }, [blogs]);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
@@ -85,6 +86,7 @@ const App = () => {
         <div>
           <p>{user.name} logged-in</p>
           <button onClick={handleLogout}>Logout</button>
+          <AddBlog setBlogsState={setBlogs}></AddBlog>
         </div>
       )}
 
