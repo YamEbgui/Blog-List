@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Blog from "./components/Blog";
-import blogService from "./services/blogs";
+import blogService from "./services/blogService";
 import loginService from "./services/loginService";
 import Notification from "./components/Notification";
 
@@ -35,6 +35,12 @@ const App = () => {
     </form>
   );
 
+  const handleLogout = (event) => {
+    event.preventDefault();
+    window.localStorage.removeItem("loggedBlogappUser");
+    setUser(null);
+  };
+
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
@@ -42,6 +48,8 @@ const App = () => {
         username,
         password,
       });
+      window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user));
+      blogService.setToken(user.token);
       setUser(user);
       setUsername("");
       setPassword("");
@@ -57,6 +65,15 @@ const App = () => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
   }, []);
 
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser");
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+      blogService.setToken(user.token);
+    }
+  }, []);
+
   return (
     <div>
       <h2>blogs</h2>
@@ -67,6 +84,7 @@ const App = () => {
       ) : (
         <div>
           <p>{user.name} logged-in</p>
+          <button onClick={handleLogout}>Logout</button>
         </div>
       )}
 
