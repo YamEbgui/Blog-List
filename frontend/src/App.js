@@ -55,7 +55,7 @@ const App = () => {
       setUsername("");
       setPassword("");
     } catch (exception) {
-      setErrorMessage("Wrong credentials");
+      setErrorMessage("Wrong Username Or Password");
       setTimeout(() => {
         setErrorMessage(null);
       }, 5000);
@@ -86,7 +86,10 @@ const App = () => {
         <div>
           <p>{user.name} logged-in</p>
           <button onClick={handleLogout}>Logout</button>
-          <AddBlog setBlogsState={setBlogs}></AddBlog>
+          <AddBlog
+            setBlogsState={setBlogs}
+            setErrorMessage={setErrorMessage}
+          ></AddBlog>
         </div>
       )}
 

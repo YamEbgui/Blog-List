@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import blogService from "../services/blogService";
 import Notification from "./Notification";
 
-const AddBlog = ({ setBlogsState }) => {
+const AddBlog = ({ setBlogsState, setErrorMessage }) => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const handleAddBlog = async (event) => {
     event.preventDefault();
@@ -21,8 +20,9 @@ const AddBlog = ({ setBlogsState }) => {
       setUrl("");
       console.log(blog);
       setBlogsState([]);
+      setErrorMessage(`a new blog ${title} by ${author} added`);
     } catch (exception) {
-      setErrorMessage("Wrong credentials");
+      setErrorMessage("Information Is Missing");
       setTimeout(() => {
         setErrorMessage(null);
       }, 5000);
@@ -32,7 +32,6 @@ const AddBlog = ({ setBlogsState }) => {
   return (
     <div>
       <h2>create new blog</h2>
-      <Notification message={errorMessage} />
       <form onSubmit={handleAddBlog}>
         <div>
           title
