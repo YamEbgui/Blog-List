@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import blogService from "../services/blogService";
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, addLikeFunction }) => {
   const [fullyDisplayed, setDisplay] = useState(false);
 
   const blogStyle = {
@@ -42,7 +42,7 @@ const Blog = ({ blog }) => {
           {"likes: " + blog.likes}{" "}
           <button
             onClick={() => {
-              return blogService.update(blog.id);
+              addLikeFunction(blog.id);
             }}
           >
             👍
