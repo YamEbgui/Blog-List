@@ -29,16 +29,16 @@ const Blog = ({ blog }) => {
 
   const fullDisplay = () => {
     return (
-      <div style={blogStyle}>
+      <div className="blog" style={blogStyle}>
         <button style={buttonStyle} onClick={toggleDisplayBlog}>
           hide
         </button>
         <p>{blog.title}</p>
         <p>{blog.author}</p>
-        <a href={blog.url}>
-          <p>{blog.url}</p>
-        </a>
-        <p>
+        <p className="url">
+          {"url: "} <a href={blog.url}>{blog.url}</a>
+        </p>
+        <p className="likes">
           {"likes: " + blog.likes}{" "}
           <button
             onClick={() => {
