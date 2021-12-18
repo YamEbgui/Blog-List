@@ -52,7 +52,9 @@ const Blog = ({ blog }) => {
         <button
           style={removeButtonStyle}
           onClick={() => {
-            return blogService.deleteBlog(blog.id);
+            if (window.confirm("Do you want to remove this blog?")) {
+              return blogService.deleteBlog(blog.id);
+            }
           }}
         >
           remove
