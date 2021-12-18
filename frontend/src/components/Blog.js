@@ -18,6 +18,11 @@ const Blog = ({ blog }) => {
     marginRight: 0,
   };
 
+  const removeButtonStyle = {
+    display: "block",
+    backgroundColor: "blue",
+  };
+
   const toggleDisplayBlog = () => {
     setDisplay(!fullyDisplayed);
   };
@@ -44,6 +49,14 @@ const Blog = ({ blog }) => {
           </button>
         </p>
         <p>{blog.user.name}</p>
+        <button
+          style={removeButtonStyle}
+          onClick={() => {
+            return blogService.deleteBlog(blog.id);
+          }}
+        >
+          remove
+        </button>
       </div>
     );
   };
